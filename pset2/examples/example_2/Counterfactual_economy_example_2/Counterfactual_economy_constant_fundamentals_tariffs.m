@@ -303,6 +303,6 @@ china(:, :, 1) = ones(12,1).*(1.2.^(1/4));
     iter = iter + 1;
 end
 
-%save('Counterfactual_economy_constant_fundamentals_Example_2.mat', 'V', 'Ldyn')
+save('Counterfactual_economy_constant_fundamentals_Example_2.mat', 'V', 'Ldyn')
 
 toc
