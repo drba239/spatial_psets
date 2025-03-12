@@ -90,19 +90,27 @@ labelsstate = { ...
 };
 
 %Loading the baseline economy
-path(path,'../Replication_files_Econometrica/Extensions/Constant_fundamentals/Baseline_economy_constant_fundamentals')
+path(path,'../../../extensions/constant_fundamentals/Baseline_economy_constant_fundamentals')
 load('Baseline_economy_constant_fundamentals.mat', 'Ldyn')
 
 L=Ldyn;
 
 %Loading the counterfactual+economy
-path(path,'/................../Replication_files_Econometrica/Examples/Example_2/Counterfactual_economy_example_2')
-load('Counterfactual_economy_constant_fundamentals_Example_2.mat', 'Ldyn')
- 
+path(path,'../Counterfactual_economy_example_2')
+load('Counterfactual_economy_constant_fundamentals_tariffs_t2.mat', 'Ldyn')
 L_kappa=Ldyn;
 
+%Loading the other counterfactual economy
+path(path,'../Counterfactual_economy_example_2')
+load('Counterfactual_economy_constant_fundamentals_Example_2.mat', 'Ldyn')
 
-Time=199;
+L_kappa2=Ldyn;
+
+
+% Originally, time was set to 200. We set it to 68, so I adjust.
+%Time=199;
+Time=67;
+
 %Employment baseline economy
 for t=1:Time
 emp(:,:,t)=L(2:23,:,t);
@@ -157,10 +165,10 @@ YMatrix1=[100*share_serv(:,ii:ll)' 100*share_serv_kappa(:,ii:ll)'];
 YMatrix2=[100*share_const(:,ii:ll)' 100*share_const_kappa(:,ii:ll)'];
 YMatrix3=[100*share_whole(:,ii:ll)' 100*share_whole_kappa(:,ii:ll)'];
 YMatrix4=[100*share_manuf(:,ii:ll)' 100*share_manuf_kappa(:,ii:ll)'];
-fig2_new(YMatrix1, YMatrix2, YMatrix3, YMatrix4)
+fig2_new_tariff(YMatrix1, YMatrix2, YMatrix3, YMatrix4)
 load('F2template.mat') %loads the variable 'template'
 setprinttemplate(gcf,template) 
-print('-dpdf','-r1000','Figure_14.pdf')
+print('-dpdf','-r1000','Figure_14_t2.pdf')
 close
 
 %Figure 15: The effects of the China shock on employment shares
@@ -170,21 +178,21 @@ YMatrix1=-[100*share_serv(:,ii:ll)'-100*share_serv_kappa(:,ii:ll)'  ];
 YMatrix2=-[100*share_const(:,ii:ll)'-100*share_const_kappa(:,ii:ll)' ];
 YMatrix3=-[100*share_whole(:,ii:ll)'-100*share_whole_kappa(:,ii:ll)'  ];
 YMatrix4=-[100*share_manuf(:,ii:ll)'-100*share_manuf_kappa(:,ii:ll)'  ];
-fig_diff(YMatrix1, YMatrix2, YMatrix3, YMatrix4)
+fig_diff_tariff(YMatrix1, YMatrix2, YMatrix3, YMatrix4)
 load('F2template.mat') %loads the variable 'template'
 setprinttemplate(gcf,template) 
-print('-dpdf','-r1000','Figure_15.pdf')
+print('-dpdf','-r1000','Figure_15_t2.pdf')
 close
 
 %Computing the changes in manufacturing employment due to the China shock
 L=permute(L,[2,1,3]);
 L_kappa=permute(L_kappa,[2,1,3]);
-empSS=L(:,2:23,199);
+empSS=L(:,2:23,Time);
 share_empSS=empSS./sum(sum(empSS)');
 manufSS=share_empSS(:, 1:12);
 share_manufSS=sum(sum(manufSS)');
 
-empSS_china=L_kappa(:,2:23,199);
+empSS_china=L_kappa(:,2:23,Time);
 share_empSS_china=empSS_china./sum(sum(empSS_china)');
 manufSS_china=share_empSS_china(:, 1:12);
 share_manufSS_china=sum(sum(manufSS_china)');
@@ -192,12 +200,12 @@ share_manufSS_china=sum(sum(manufSS_china)');
 manufactures_share_china_shock=100*(share_manufSS-share_manufSS_china)
 
 %Computing the changes in non-manufacturing employment due to the China shock
-empSS=L(:,2:23,199);
+empSS=L(:,2:23,Time);
 share_empSS=empSS./sum(sum(empSS)');
 nonmanufSS=share_empSS(:, 13:22);
 share_nonmanufSS=sum(sum(nonmanufSS)');
 
-empSS_china=L_kappa(:,2:23,199);
+empSS_china=L_kappa(:,2:23,Time);
 share_empSS_china=empSS_china./sum(sum(empSS_china)');
 nonmanufSS_china=share_empSS_china(:, 13:22);
 share_nonmanufSS_china=sum(sum(nonmanufSS_china)');
@@ -290,48 +298,128 @@ yvector1=sectoralmanuf;
 fig3(yvector1)
 load('F3template.mat') %loads the variable 'template'
 setprinttemplate(gcf,template) 
-print('-dpdf','-r1000','Figure_16.pdf')
+print('-dpdf','-r1000','Figure_16_t2.pdf')
 close
 
 %Figure 17: Regional contribution to U.S. aggregate manufacturing employment
 %decline (%)
 disp('Figure 17: Regional contribution manufactures')
 yvector1=regionalmanuf;
-Parent1=uipanel;
-fig4(yvector1)
+fig4_tariff(yvector1)
 load('F4template.mat') %loads the variable 'template'
 setprinttemplate(gcf,template) 
-print('-dpdf','-r1000','Figure_17.pdf')
+print('-dpdf','-r1000','Figure_17_t2.pdf')
 close
+
+
+%% 
 
 %Figure 18: Regional contribution to U.S. agg. mfg. emp. decline normalized by regional emp. share 
 disp('Figure 18: Regional contribution manufacturing employment change normalized by employment') 
 sh=regemp./sum(regemp);
 yvector1=regionalmanuf./(100*sh)'; %normalized by employment
-Parent1=uipanel;
 fig4_new(yvector1)
 load('F4template.mat') %loads the variable 'template'
 setprinttemplate(gcf,template) 
-print('-dpdf','-r1000','Figure_18.pdf')
+print('-dpdf','-r1000','Figure_18_t2.pdf')
+close
 
 %Figure 19: Non-manufacturing employment increases (% of total) due to the
 %China trade shock
 disp('Figure 19: Sectoral contribution Non-Manufactures')
 yvector1=sectoralnonmanuf;
-Parent1=uipanel;
 fig3aa(yvector1)
 load('F3template.mat') %loads the variable 'template'
 setprinttemplate(gcf,template) 
-print('-dpdf','-r1000','Figure_19.pdf')
+print('-dpdf','-r1000','Figure_19_t2.pdf')
 close
 
 %Figure 20: Regional contribution to U.S. aggregate non-manufacturing
 %employment increase (%)
 disp('Figure 20: Regional Contribution Non_manufactures')
 yvector1=regionalnonmanuf;
-Parent1=uipanel;
 fig4(yvector1)
 load('F4template.mat') %loads the variable 'template'
 setprinttemplate(gcf,template) 
-print('-dpdf','-r1000','Figure_20.pdf')
+print('-dpdf','-r1000','Figure_20_t2.pdf')
 close
+
+%%
+% NEW STUFF
+
+%%%
+% State Share of Total Decline
+%%%
+
+%%%%%
+% Suppose you want total employment by region i at each time t.
+% L is dimension [50 x 22 x Time] after you move unemployment aside, so 
+%   summing over the 1st dimension (the 22 industries) gives total emp. 
+%   for each region (2nd dim) at each time (3rd dim).  
+
+%Computing the changes in total employment due to the China shock
+empSS=L(:,2:23,Time);
+share_empSS=empSS./sum(sum(empSS)');
+% manufSS=share_empSS(:, 1:12);
+% share_manufSS=sum(sum(manufSS)');
+
+empSS_china=L_kappa(:,2:23,Time);
+share_empSS_china=empSS_china./sum(sum(empSS_china)');
+% manufSS_china=share_empSS_china(:, 1:12);
+% share_manufSS_china=sum(sum(manufSS_china)');
+
+emp_share_china_shock=100*(share_empSS-share_empSS_china); 
+
+
+
+%Computing the regional contribution to the change in total
+%employment share due to the China shock (Figure 32)
+emp0=emp(:,:,2)';
+emp0_n=sum(emp0')';
+empSS_n=sum(empSS')';
+empSS_n_china=sum(empSS_china')';
+% manuf0=manuf(:,:,2)';
+% manuf0_n=sum(manuf0')';
+% manufSS_n=sum(manufSS')';
+% manufSS_n_china=sum(manufSS_china')';
+
+chg_n=empSS_n-emp0_n;
+chg_n_china=empSS_n_china-emp0_n;
+
+china_all_effect_n=chg_n_china-chg_n;
+sum_china_all_effect_n =sum(china_all_effect_n);
+
+regionalAll=100*(china_all_effect_n)./sum(china_all_effect_n);
+ 
+
+
+% Then plot as before:
+disp('Regional contribution - total employment change');
+bonus_fig1_tariff(regionalAll);
+load('F4template.mat'); 
+setprinttemplate(gcf, template);
+print('-dpdf','-r1000','Figure_total_employ_share_comparison_t2.pdf');
+close;
+
+%%
+
+%%%
+% Share of Labor Force in Each State
+%%%
+
+%Computing the changes in total employment due to the China shock
+employ_share_by_state=sum((share_empSS)');
+employ_share_by_state_china=sum((share_empSS_china)');
+
+diff_employ_share=100*(employ_share_by_state_china-employ_share_by_state)';
+
+% share_empSS
+% share_empSS_china
+
+% Then plot as before:
+disp('Regional contribution - total employment change');
+bonus_fig1_tariff(diff_employ_share);
+load('F4template.mat'); 
+setprinttemplate(gcf, template);
+print('-dpdf','-r1000','Figure_total_employ_comparison_t2.pdf');
+close;
